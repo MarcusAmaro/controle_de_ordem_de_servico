@@ -56,7 +56,7 @@
             <div class="row mb-3">
                 <div class="col-sm-3">
                     <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon3">Pesquisar por: </span>
+                        <span class="input-group-text" id="basic-addon3">Pesquisar por situação: </span>
                         <select  name='tipo_ordem' class="form-control">
                             <option >....</option>
                             <option value='Esperando Orçamento'>Esperando orçamento</option>
