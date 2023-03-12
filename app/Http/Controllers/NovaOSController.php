@@ -99,19 +99,20 @@ class NovaOSController extends Controller
 
     public function Consulta_Tipo(Request $request){
         $dadosdaordem = [];
-        $dadosOrdem = ordemservico::where('ord_situacao','=', $request->tipo_ordem)->where('ord_aberto','=', 1)->get();
-        if(!empty($dadosOrdem)){
-            foreach($dadosOrdem as $row){
+        $dadosOrdem = DB::table('ordemservicos')
+                ->select('ordemservicos.id as numeroOrdem', 'ordemservicos.ord_situacao as Situacao', 'clientes.cli_nome as Cliente', 'aparelhos.apa_tipo as Tipo')
+                ->join('aparelhos', 'ordemservicos.apa_id', '=', 'aparelhos.id')
+                ->join('clientes', 'ordemservicos.cli_id', '=', 'clientes.id')
+                ->where('ordemservicos.ord_situacao', '=', $request->tipo_ordem)
+                ->where('ordemservicos.ord_aberto', '=', $request->ordem_abertas)
+                ->where('aparelhos.apa_tipo', '=', $request->tipo_Aparelho)
+                ->get();
 
-                $dadosCliente = cliente::where('id',$row['cli_id'])->get();
-                foreach($dadosCliente as $linha){
-                    $listaDados = [$row['id'],$row['ord_situacao'],$linha['cli_nome']];
-                }
-                
-                array_push($dadosdaordem,$listaDados);
- 
-            }
-            return view('verificarOrdem')->with('dadosOrdem',$dadosdaordem);
+
+
+        if(!empty($dadosOrdem)){
+           
+            return view('verificarOrdem')->with('dadosOrdem',$dadosOrdem);
         }else{
             return view('verificarOrdem')->with('error404','Ordem nao encontrada com a situação indicada');
 
@@ -133,3 +134,5 @@ class NovaOSController extends Controller
 
     }
 }
+
+

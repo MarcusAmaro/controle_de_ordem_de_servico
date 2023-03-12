@@ -4,8 +4,7 @@
 
 @section('title' , 'Welcome')
 
-@section('content')
-    
-        <h1>pagina de welcome</h1>
+@section('content')     
+        {{ $dadosOrdem }}
     
 @endsection

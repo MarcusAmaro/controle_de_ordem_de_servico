@@ -77,7 +77,15 @@
             
             <h3>Dados do cliente</h3>
 
-            <div class="row mb-3 mt-8" >
+            <div class="row mb-3 mt-8">
+                <label for="cpfCliente" class="col-sm-2 col-form-label">Cpf:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="cpfCliente"  name='cpfCliente'  placeholder="Cpf do cliente" onchange="minhaFuncao(this.value)">
+                </div>
+            </div>
+
+
+            <div class="row mb-3 " >
                 
                 <label for="nomeCliente" class="col-sm-2 col-form-label">Nome:</label>
                 <div class="col-sm-10">
@@ -99,13 +107,7 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <label for="cpfCliente" class="col-sm-2 col-form-label">Cpf:</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="cpfCliente"  name='cpfCliente'  placeholder="Cpf do cliente">
-                </div>
-            </div>
-
+            
             <div class="row mb-3">
                 <label for="endCLiente" class="col-sm-2 col-form-label">Endereço do cliente:</label>
                 <div class="col-sm-10">
@@ -119,5 +121,25 @@
         
 </div>
   
+<script>
+    function minhaFuncao(texto) {
+            $.ajax({
+            url: "api/cliente/"+texto,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) { 
+                document.getElementById("nomeCliente").value = data[0].nome;
+                document.getElementById("telefoneCliente").value = data[0].telefone;
+                document.getElementById("telefoneCliente2").value = data[0].telefone2;
+                document.getElementById("endCLiente").value = data[0].endereco; 
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 404) {
+                    console.log('data nao encontrada')
+                }
+            }
 
+        });
+    }
+</script>
 @endsection

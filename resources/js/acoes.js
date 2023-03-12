@@ -1,0 +1,1 @@
+console.log($('input[name="selecionar_tipo"]:checked').val());
