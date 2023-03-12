@@ -18,7 +18,7 @@
 
 @section('content')
     
-    @if(empty($dadosOrdem))
+    @if(empty($dadosOrdem) || empty($dadosOrdem) )
     <div class='container'> 
         <div class='mt-3'>
             <h1>Buscar ordem por : </h1>
@@ -45,12 +45,9 @@
                 </div>
             </div>  
         </form>
-    </div>
-    @else
-    <div class='container'>
-        <div class='mt-3'>
-            <h1>Buscar ordem por : </h1>
-        </div>
+
+        
+        <!-- pesquisar por situaçao -->
         <form method='post' action='/buscar-OS-tipo'>
             @csrf <!-- {{ csrf_field() }} -->
             <div class="row mb-3">
@@ -73,6 +70,55 @@
                 </div>
             </div>  
         </form>
+
+        <!-- pesquisar todas abertas -->
+        <form method='post' action='/buscar-OS-tipo'>
+            @csrf <!-- {{ csrf_field() }} -->
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Ordens Abertas: </span>
+                        <select  name='ordem_abertas' class="form-control">
+                            <option >....</option>
+                            <option value='Ordens Abertas'>Ordens Abertas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary form-control" id='buscarOrdem'>Buscar</button>
+                </div>
+            </div>  
+        </form>
+
+        <!-- pesquisar por tipo de aparelho -->
+        <form method='post' action='/buscar-OS-tipo'>
+            @csrf <!-- {{ csrf_field() }} -->
+            <div class="row mb-3">
+                <div class="col-sm-3">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon3">Pesquisar por tipo de aparelho: </span>
+                        <select  name='tipo_tipo_de_aparelho' class="form-control">
+                            <option >....</option>
+                            <option value='Notebook'>Notebook</option>
+                            <option value='Impressora'>Impressora</option>
+                            <option value='Nobreak'>Nobreak</option>
+                            <option value='Celular'>Celular</option>
+                            <option value='Monitor'>Monitor</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary form-control" id='buscarOrdem'>Buscar</button>
+                </div>
+            </div>  
+        </form>
+
+
+    </div>
+    @else
+    <div class='container'>
+        
 
     <table class="table">
         <thead>
