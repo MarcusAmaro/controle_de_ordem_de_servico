@@ -2,16 +2,13 @@
 
 @section('style')
     <style>
-
         #buscarOrdem, .gravar-ordem{
             margin-top:0px !important
 
         }
-
         td,th{
             vertical-align: middle;
         }
-
         .pesquisa-prod{
             display: flex;
             align-items: center;
@@ -36,7 +33,7 @@
 
     @if(empty($dadosOrdem))
         <div class='container'>
-            
+
             <div class="mt-3">
                 <h1>Buscar Ordem: </h1>
             </div>
@@ -53,22 +50,11 @@
                     </div>
                     
                 </div>
-
-            
-                
             </form>
-    </div>
+        </div>
     
       
     @else
-       
-
-       
-
-
-
-
-
         <div class='container'>
         <form method='post' action='/buscar-OS'>
                 @csrf <!-- {{ csrf_field() }} -->
@@ -91,14 +77,8 @@
                         </div>
                     </div>
                 </div>
-    
-
             </div>
             </form>
-
-
-
-
        
         <div class = 'row'>
             <div class="col-md-6">
@@ -221,8 +201,6 @@
 
                         </div>
                        
-
-
                     </div>
                     </div>
                     <div class="modal-footer">
@@ -257,9 +235,6 @@
 
 
                             </div>
-                        
-
-
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -287,13 +262,26 @@
                         <table class = "table " id='produtos-usados-table'>
                             <thead>
                                 <tr>
+                                    <th>Codigo</th>
                                     <th>Produto</th>
                                     <th>Valor</th>
                                     <th>Ação</th>
                                 <tr>
                             <thead>
                             <tbody id='produtos-usados-tbody'>
+                                
+                                @if(!empty($dadosServicos))
+                                    @foreach($dadosProdutos as $linhas)
+                                        <tr>
+                                        <td>{{ $linhas[0] }}</td>
+                                        <td>{{ $linhas[1] }}</td>
+                                        <td>{{ $linhas[2] }}</td>
+                                        <td><button class="btn btn-danger btn-remove-prod" onclick="atualizaProdutosRemovidosInput({{ $linhas[0] }})">Remover</button></td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
+                               
                         </table>
                     </div>
                 </div>
@@ -310,11 +298,23 @@
                     <div id = 'lista-servicos-prestados'>
                         <table class = "table " id='servicos-prestados-table'>
                             <thead>
+                                <th>Codigo</th>
                                 <th>Serviços</th>
                                 <th>Valor</th>
                                 <th>Ação</th>
                             </thead>
                             <tbody id='servicos-prestados-tbody'>
+                                @if(!empty($dadosServicos))
+                                    @foreach($dadosServicos as $linhas)
+                                        <tr>
+                                        <td>{{ $linhas[0] }}</td>
+                                        <td>{{ $linhas[1] }}</td>
+                                        <td>{{ $linhas[2] }}</td>
+                                        <td><button class="btn btn-danger btn-remove-serv" onclick="atualizaServicosRemovidosInput({{ $linhas[0] }})">Remover</button></td>
+                                        
+                                        </tr>
+                                    @endforeach
+                                @endif
 
                             </tbody>
                         </table>
@@ -328,6 +328,7 @@
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon3">Valor da Ordem: </span>
                     <input type="text" class="form-control" id="valorAtual" aria-describedby="basic-addon3" value="" readonly>
+                    <input type="hidden" name="valorAtualCampo" id="valorAtualCampo">
                 </div>
             </div>
 
@@ -358,6 +359,12 @@
             </div>
         </div>
 
+        <input type="hidden" name="produtosUsadosOrdem"             id="produtosUsadosOrdem">
+        <input type="hidden" name="servicosPrestadosOrdem"          id="servicosPrestadosOrdem">
+
+        <input type="hidden" name="produtosRemovidosUsadosOrdem"    id="produtosRemovidosUsadosOrdem">
+        <input type="hidden" name="servicosRemovidosPrestadosOrdem" id="servicosRemovidosPrestadosOrdem">
+
         <div class="col-md-3 mt-4">
             <button type="submit" class="btn btn-primary gravar-ordem">Salvar nova OS</button>
         </div>
@@ -365,23 +372,50 @@
         </form>
 
         @endforeach
-
             <script>
+                $(document).ready(function() {
+                    var total = 0;
+                    $('#produtos-usados-tbody tr').each(function() {
+                        var valor = parseFloat($(this).find('td:nth-child(3)').text());
+                        if (!isNaN(valor)) {
+                            total += valor;
+                        }
+                    });
+
+                    $('#servicos-prestados-tbody tr').each(function() {
+                        var valor = parseFloat($(this).find('td:nth-child(3)').text());
+                        if (!isNaN(valor)) {
+                            total += valor;
+                        }
+                    });
+
+
+                    $('#valorAtual').val(total.toFixed(2)); // Define o valor total no input, formatado com duas casas decimais
+
+                });
+
+                $('#servicos-prestados-tbody').on('click', '.btn-remove-serv', function() {
+                    $(this).closest('tr').remove();
+                });
+
+                $('#produtos-usados-tbody').on('click', '.btn-remove-prod', function() {
+                    $(this).closest('tr').remove();
+                });
+
+
                 $('#myModal').on('shown.bs.modal', function () {
                     $('#myInput').trigger('focus')
                 })
-            
+                
                 function produtosUsados() {
                     let produto;
                     produto = document.getElementById("buscaProdutos").value;
-
                     $.ajax({
                         url: "api/produtosusados/"+produto,
                         type: 'GET',
                         dataType: 'json',
                         success: function(data) { 
-                            if(data.length !== 0 ){
-                                
+                            if(data.length !== 0 ){   
                                 var tableHtml = "<table class='table'>";
                                 tableHtml += "<tr><th>Codigo</th><th>Peça</th><th>Valor</th><th>Adicionar</th></tr>";
                                 $.each(data, function(index, item) {
@@ -401,7 +435,6 @@
                     });
                 }
 
-
                 function adicionaProduto(codigoProduto){
                     let numLinhas;
                     let tabela;
@@ -413,6 +446,7 @@
                             $.each(data, function(index, item) {
                                 numLinhas = $('#produtos-usados-tbody tr').length + 1;
                                 tabela += "<tr id=linhaProdutos"+numLinhas+">";
+                                tabela += " <td>"+codigoProduto+"</td>";
                                 tabela += " <td>"+item.produto+"</td>";
                                 tabela += " <td>"+item.valor+"</td>";
                                 tabela += " <td><button type='button' class='btn btn-danger' onclick='removerLinhaProduto("+numLinhas+")'>Remover</button></td>";
@@ -420,7 +454,9 @@
                                 $("#produtos-usados-tbody").append(tabela);
                             }) 
                         },
+
                     });
+                    atualizarProdutosUsadosInput();
                 }
 
                 $(document).ready(function() {
@@ -428,12 +464,39 @@
                         var valorFinal = 0
                         var valorProd = 0;
                         var valorServ = 0
+                        var valorProdUsados = $('#produtos-usados-table tbody tr td:nth-child(3)').map(function() {
+                            return $(this).text();
+                        }).get();
+                        var valorServPrestados = $('#servicos-prestados-table tbody tr td:nth-child(3)').map(function() {
+                            return $(this).text();
+                        }).get();
+                        if(valorProdUsados.length > 0){
+                            $.each(valorProdUsados, function(index, value) {
+                                valorProd = valorProd + parseFloat(value);
+                            });
+                        } 
+                        if(valorServPrestados.length > 0){
+                            $.each(valorServPrestados, function(index, value) {
+                                valorServ = valorServ + parseFloat(value);
+                            });
+                        }
+                        valorFinal = valorProd + valorServ;
+                        $("#valorAtual").val(valorFinal);
+                        $("#valorAtualCampo").val(valorFinal);
+                        
+                    });
+                });
 
-                        var valorProdUsados = $('#produtos-usados-table tbody tr td:nth-child(2)').map(function() {
+                $(document).ready(function() {
+                    $('#servicos-prestados-table').on('DOMSubtreeModified', function() {
+                        var valorFinal = 0
+                        var valorProd = 0;
+                        var valorServ = 0
+                        var valorProdUsados = $('#produtos-usados-table tbody tr td:nth-child(3)').map(function() {
                             return $(this).text();
                         }).get();
 
-                        var valorServPrestados = $('#servicos-prestados-table tbody tr td:nth-child(2)').map(function() {
+                        var valorServPrestados = $('#servicos-prestados-table tbody tr td:nth-child(3)').map(function() {
                             return $(this).text();
                         }).get();
 
@@ -452,6 +515,8 @@
                         valorFinal = valorProd + valorServ;
 
                         $("#valorAtual").val(valorFinal);
+                        $("#valorAtualCampo").val(valorFinal);
+
 
                     });
                 });
@@ -459,24 +524,25 @@
                 function removerLinhaProduto(linha){
                     var linhaApagar = "#linhaProdutos"+linha;
                     $(linhaApagar).remove();
+                    atualizarProdutosUsadosInput()
                 }
 
-
-
+                 function removerLinhaServico(linha){
+                    var linhaApagar = "#linhaServico"+linha;
+                    $(linhaApagar).remove();
+                    atualizarServicosPrestadosInput()
+                }
 
                 //funçoes dos serviços
-
                 function servicosPrestados(){
                     let servicos;
                     servico = document.getElementById("buscaServicos").value;
-
                     $.ajax({
                         url: "api/servicosPrestados/"+servico,
                         type: 'GET',
                         dataType: 'json',
                         success: function(data) { 
-                            if(data.length !== 0 ){
-                                
+                            if(data.length !== 0 ){   
                                 var tableHtml = "<table class='table'>";
                                 tableHtml += "<tr><th>Codigo</th><th>Serviço</th><th>Valor</th><th>Adicionar</th></tr>";
                                 $.each(data, function(index, item) {
@@ -505,20 +571,75 @@
                         dataType: 'json',
                         success: function(data) { 
                             $.each(data, function(index, item) {
-                                numLinhas = $('#produtos-usados-tbody tr').length + 1;
-                                tabela += "<tr id=linhaProdutos"+numLinhas+">";
-                                tabela += " <td>"+item.produto+"</td>";
+                                numLinhas = $('#servicos-prestados-tbody tr').length + 1;
+                                tabela += "<tr id=linhaServico"+numLinhas+">";
+                                tabela += " <td>"+codigoServico+"</td>";
+                                tabela += " <td>"+item.servico+"</td>";
                                 tabela += " <td>"+item.valor+"</td>";
-                                tabela += " <td><button type='button' class='btn btn-danger' onclick='removerLinhaProduto("+numLinhas+")'>Remover</button></td>";
+                                tabela += " <td><button type='button' class='btn btn-danger' onclick='removerLinhaServico("+numLinhas+")'>Remover</button></td>";
                                 tabela += "</tr>";
-                                $("#produtos-usados-tbody").append(tabela);
+                                $("#servicos-prestados-tbody").append(tabela);
                             }) 
                         },
                     });
+                    atualizarServicosPrestadosInput()
+                }
+
+                function atualizaProdutosRemovidosInput($codigo){
+                    var removidos = $('#produtosRemovidosUsadosOrdem').val();
+                    if (removidos) {
+                        removidos = JSON.parse(removidos);
+                    } else {
+                        removidos = [];
+                    }
+                    removidos.push({codigo: $codigo});
+                    $('#produtosRemovidosUsadosOrdem').val(JSON.stringify(removidos));
+                   
+                    
+                }
+                
+
+                function atualizaServicosRemovidosInput($codigo){
+                    var removidos = $('#servicosRemovidosPrestadosOrdem').val();
+                    if (removidos) {
+                        removidos = JSON.parse(removidos);
+                    } else {
+                        removidos = [];
+                    }
+                    removidos.push({codigo: $codigo});
+                    $('#servicosRemovidosPrestadosOrdem').val(JSON.stringify(removidos));
+                   
+                    
+                }
+
+                function atualizarProdutosUsadosInput() {
+                    var produtos = [];   
+                    setTimeout(function() {
+                        $('#produtos-usados-table tbody tr').each(function() {
+                            var codigo = $(this).find('td').eq(0).text();
+                            var produto = $(this).find('td').eq(1).text();
+                            var valor = $(this).find('td').eq(2).text();
+                            produtos.push({ codigo: codigo ,produto: produto, valor: valor });
+                         });
+
+                         $('#produtosUsadosOrdem').val(JSON.stringify(produtos));
+                    }, 1000);
+                }   
+
+                function atualizarServicosPrestadosInput() {
+                    var servicos = [];
+                     setTimeout(function() {           
+                       $('#servicos-prestados-table tbody tr').each(function() {
+                            var codigo = $(this).find('td').eq(0).text();
+                            var servico = $(this).find('td').eq(1).text();
+                            var valor = $(this).find('td').eq(2).text();
+                            servicos.push({ codigo: codigo, servico: servico, valor: valor });
+                        });
+                        $('#servicosPrestadosOrdem').val(JSON.stringify(servicos));
+                        console.log(servicos)
+                    }, 1000);             
                 }
             </script>
-    </div>
-       
+    </div>  
     @endif
-
 @endsection

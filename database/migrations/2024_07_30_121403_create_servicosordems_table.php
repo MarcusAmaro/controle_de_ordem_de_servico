@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('clientes', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('cli_nome','100');
-            $table->string('cli_cpf','11');
-            $table->string('cli_endereco','255');
-            $table->string('cli_telefone','20');
-            $table->string('cli_telefone2','20');
+        Schema::create('servicosordems', function (Blueprint $table) {
+            $table->id();
+            $table->integer('id_servico');
+            $table->integer('id_ordem');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('clientes');
+        Schema::dropIfExists('servicosordems');
     }
 };

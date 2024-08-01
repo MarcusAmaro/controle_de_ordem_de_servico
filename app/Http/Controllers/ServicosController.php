@@ -16,8 +16,18 @@ class ServicosController extends Controller
         if(!empty($dadosOrdem)){
             return response()->json($dadosOrdem);
         }
-        
-       
+    }
 
+
+
+    public function adicionaServicoID(Request $request,$codigo=null){
+        $dadosOrdem = DB::table('servicos')
+        ->select('serv_nome as servico','serv_valor as valor')
+        ->where('id', '=', "$codigo")
+        ->get();
+
+        if(!empty($dadosOrdem)){ 
+            return response()->json($dadosOrdem);
+        }
     }
 }

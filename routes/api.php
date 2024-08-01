@@ -28,3 +28,4 @@ Route::get('/adicionaProdutoID/{codigo}', [ProdutosController::class, 'adicionaP
 
 
 Route::get('/servicosPrestados/{codigo}', [ServicosController::class, 'servicosUsados']);
+Route::get('/adicionaServicoID/{codigo}', [ServicosController::class, 'adicionaServicoID']);

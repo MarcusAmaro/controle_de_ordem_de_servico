@@ -39,6 +39,10 @@ Route::get('/consultar', function () {
 });
 
 
+Route::get('/dados-cliente',function(){
+    return view('consultarCliente');
+});
+
 Route::get('/consultar/{id}', [NovaOSController::class, 'Consulta']);
 
 
@@ -56,4 +60,4 @@ Route::put('/Salvar-os/{id}', [NovaOSController::class, 'Editar']);
 
 
 Route::get('/consultarCliente/{texto}', [ClientesController::class, 'clientepelocpf']);
-Route::post('/consultarCliente/{texto}', [ClientesController::class, 'dadoscompletos']);
+Route::post('/consultarCliente', [ClientesController::class, 'dadoscompletos']);

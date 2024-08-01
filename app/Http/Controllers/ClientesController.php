@@ -21,43 +21,67 @@ class ClientesController extends Controller
     }
 
     //chave é o cpf/cnpj ou nome completo do cliente
-    public function dadoscompletos(Request $request, $chave){
-        //aqui é buscado os dados do cliente pelo nome completo ou pelo cpf e depois é armazenado seu id
-        //para buscar as ordens de serviço cadastradas com sua id
-        if (is_numeric($chave)) {
+    public function dadoscompletos(Request $request){
+        
+        
+
+        $request->validate([
+            'nomeoucpf' => 'required|string|max:255',
+        ]);
+
+        $chave = $request->input('nomeoucpf');
+
+
+
+        // //aqui é buscado os dados do cliente pelo nome completo ou pelo cpf e depois é armazenado seu id
+        // //para buscar as ordens de serviço cadastradas com sua id
+        if (preg_match('/^\d{10}$/', $chave)) {
+            // Busca por CPF
             $dadosCliente = DB::table('clientes')
-                ->select('id','cli_nome as nome','cli_telefone as telefone', 'cli_telefone2 as telefone2','cli_endereco as endereco')
+                ->select('id', 'cli_nome as nome', 'cli_telefone as telefone', 'cli_telefone2 as telefone2', 'cli_endereco as endereco')
                 ->where('cli_cpf', '=', $chave)
                 ->get();
 
-        }else if(!is_numeric($chave)){
+        }else {
+            // Busca por nome
             $dadosCliente = DB::table('clientes')
                 ->select('id','cli_nome as nome','cli_telefone as telefone', 'cli_telefone2 as telefone2','cli_endereco as endereco')
                 ->where('cli_nome', '=', $chave)
-                ->get();
+                ->get(); 
+        }
+
+
+        if ($dadosCliente->count() !== 0) {
+            
+            foreach ($dadosCliente as $key) {
+                $id = $key->id;
+            
+                //após conseguir os dados do cliente, é buscado todas as ordems cadastradas com seu ID
+                $dadosOrdem = DB::table('ordemservicos')
+                        ->select('id as numeroOrdem','ord_situacao as Situacao','ord_aberto')
+                        ->where('cli_id','=', $id)->get();
+
+                if($dadosOrdem->count() !== 0){
+                    // return response()->json([
+                    //     'dadosOrdem' => $dadosOrdem,
+                    //     'dadosCliente' => $dadosCliente
+                    // ]);
+
+                    return view('consultarCliente')
+                        ->with('dadosOrdem', $dadosOrdem)
+                        ->with('dadosCliente', $dadosCliente);
+                }else{
+                    return response()->json([
+                        'dadosOrdem' => 'None',
+                        'dadosCliente' => $dadosCliente
+                    ]);
+                }
+            }
+
         }else{
-            return response()->json("Dados não encontrados com o parametros informados");
-        }
+            return response()->json(['message' => 'Nenhum cliente encontrado'], 404);
 
-        foreach ($dadosCliente as $key) {
-            $id = $key->id;
         }
-
-        //após conseguir os dados do cliente, é buscado todas as ordems cadastradas com seu ID
-        $dadosOrdem = DB::table('ordemservicos')
-                ->select('id','ord_situacao','ord_aberto')
-                ->where('cli_id','=' $id)->get();
-
-        if(!empty($dadosOrdem)){
-            return response()->json([
-                'dadosOrdem' => $dadosOrdem,
-                'dadosCliente' => $dadosCliente
-            ]);
-        }else{
-            return response()->json([
-                'dadosOrdem' => 'None',
-                'dadosCliente' => $dadosCliente
-            ]);
-        }
+        
     }
 }

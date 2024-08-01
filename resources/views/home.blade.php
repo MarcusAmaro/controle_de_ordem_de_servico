@@ -64,7 +64,7 @@
             </div>
           </div>
           <div class="col-md-6 mb-4">
-            <div class="card card-cliente" onclick="location.href='/#';" style="cursor: pointer;">
+            <div class="card card-cliente" onclick="location.href='/dados-cliente';" style="cursor: pointer;">
               <div class="card-body">
                 <h5 class="card-title">Clientes</h5>
                 <p class="card-text">Cadastra clientes</p>
